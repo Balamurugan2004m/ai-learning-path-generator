@@ -1,9 +1,9 @@
 import streamlit as st
 from utils import run_agent_sync
 
-st.set_page_config(page_title="MCP POC", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="AI Learning Path Generator", page_icon="🎓", layout="wide")
 
-st.title("Model Context Protocol(MCP) - Learning Path Generator")
+st.title("AI-Based Learning Path Generator Using MCP")
 
 # Initialize session state for progress
 if 'current_step' not in st.session_state:
