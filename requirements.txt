@@ -1,0 +1,5 @@
+langchain
+langgraph
+langchain-mcp-adapters
+langchain-google-genai
+streamlit
