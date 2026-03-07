@@ -17,6 +17,7 @@ if 'is_generating' not in st.session_state:
 
 # Sidebar for API and URL configuration.
 st.sidebar.header("Configuration")
+# configuration
 
 # API Key input
 google_api_key = st.sidebar.text_input("Google API Key", type="password")
