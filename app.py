@@ -15,7 +15,7 @@ if 'last_section' not in st.session_state:
 if 'is_generating' not in st.session_state:
     st.session_state.is_generating = False
 
-# Sidebar for API and URL configuration
+# Sidebar for API and URL configuration.
 st.sidebar.header("Configuration")
 
 # API Key input
