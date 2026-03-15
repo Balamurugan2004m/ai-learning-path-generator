@@ -16,6 +16,7 @@ if 'is_generating' not in st.session_state:
     st.session_state.is_generating = False
 
 # Sidebar for API and URL configuration
+#added config
 st.sidebar.header("Configuration")
 
 # API Key input
