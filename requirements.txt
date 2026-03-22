@@ -3,3 +3,5 @@ langgraph
 langchain-mcp-adapters
 langchain-google-genai
 streamlit
+python-dotenv
+httpx
