@@ -5,3 +5,7 @@ langchain-google-genai
 streamlit
 python-dotenv
 httpx
+composio-core
+google-generativeai
+fastapi
+uvicorn

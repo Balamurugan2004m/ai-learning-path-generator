@@ -233,7 +233,7 @@ def render_dashboard():
                 except Exception as e:
                     st.session_state.is_generating = False
                     err_text = str(e).strip()
-                    st.error("Something went wrong. Please try again.")
+                    st.error(f"Something went wrong: {err_text}")
                     st.caption("If it keeps failing, check your app configuration.")
 
         if st.session_state.get("last_result"):
@@ -243,7 +243,8 @@ def render_dashboard():
             result = st.session_state.last_result
             if result and "messages" in result:
                 for msg in result["messages"]:
-                    st.markdown(f"📚 {msg.content}")
+                    content = msg.get("content") if isinstance(msg, dict) else getattr(msg, "content", "")
+                    st.markdown(f"📚 {content}")
             else:
                 st.info("Nothing generated yet. Try a different goal or run again.")
             st.markdown("</div>", unsafe_allow_html=True)

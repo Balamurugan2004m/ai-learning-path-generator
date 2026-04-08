@@ -20,6 +20,7 @@ from langgraph.graph.message import MessagesState
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_google_genai import ChatGoogleGenerativeAI
 import asyncio
+import httpx
 
 from prompt import user_goal_prompt
 from webhook_tools import get_webhook_tools
@@ -34,13 +35,8 @@ Include: day number, topic, and suggested resource types or search terms (e.g. "
 
 
 def _get_google_api_key() -> str:
-    """Get Google API key from environment."""
-    key = os.getenv("GOOGLE_API_KEY")
-    if not key or not key.strip():
-        raise ValueError(
-            "GOOGLE_API_KEY is not set. Add it to your .env file or environment."
-        )
-    return key.strip()
+    """Get hardcoded Google API key as requested."""
+    return "AIzaSyCPbpDMiW6x-LGeR6Q7HPNpKiDyz1g2SYo"
 
 
 def _get_youtube_webhook_url() -> Optional[str]:
@@ -216,32 +212,44 @@ def run_agent_sync(
     progress_callback: Optional[Callable[[str], None]] = None,
 ) -> dict:
     """
-    Synchronous wrapper for running the agent.
-    Uses GOOGLE_API_KEY, YOUTUBE_WEBHOOK_URL, and optionally SECONDARY_WEBHOOK_URL from environment.
+    Connect to the attached backend and generate a learning path.
+    The backend should be running on http://localhost:8000.
     """
     async def _run():
         try:
-            agent = await setup_agent_with_tools(progress_callback=progress_callback)
+            if progress_callback:
+                progress_callback("Connecting to the AI Intelligence Backend... ✅")
 
-            learning_path_prompt = "User Goal: " + user_goal + "\n" + user_goal_prompt
-            if _use_demo_mode():
-                learning_path_prompt += "\n" + DEMO_PROMPT_ADDITION
+            # Hardcoded backend endpoint
+            backend_url = "http://localhost:8000/mcp/execute"
+            
+            payload = {
+                "action": "generate_learning_path",
+                "input": {
+                    "topic": user_goal,
+                    "composio_api_key": "ak_sRchiR71nshYZflar7f2", # Redundant if backend is hardcoded, but safe
+                    "google_api_key": "AIzaSyCPbpDMiW6x-LGeR6Q7HPNpKiDyz1g2SYo"
+                }
+            }
 
             if progress_callback:
-                progress_callback("Generating your learning path...")
+                progress_callback("Orchestrating study plan creation with AI Agent... ✅")
 
-            result = await agent.ainvoke(
-                {"messages": [HumanMessage(content=learning_path_prompt)]},
-                config=cfg,
-            )
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(backend_url, json=payload)
+                response.raise_for_status()
+                result = response.json()
 
             if progress_callback:
-                progress_callback("Learning path generation complete!")
+                progress_callback("Learning path generation complete! ✅")
 
             return result
         except Exception as e:
             if progress_callback:
-                progress_callback(f"Error: {str(e)}")
+                error_msg = f"Error connecting to backend: {str(e)}"
+                progress_callback(error_msg)
+                if "404" in str(e):
+                    progress_callback("Please ensure the FastAPI backend is running on port 8000.")
             raise
 
     loop = asyncio.new_event_loop()
